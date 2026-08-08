@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HANGAR 19 — Work</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --font: 'Open Sans Condensed', 'Open Sans', Arial Narrow, sans-serif; }
+
+    body { background: #fff; color: #111; font-family: var(--font); overflow-x: hidden; }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; inset: 0; background: #000; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.7s ease;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-logo {
+      font-family: var(--font); font-weight: 800;
+      font-size: clamp(2rem, 6vw, 5rem); color: #fff;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── PAGE ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 60px 48px 0; }
+
+    .top-row { margin-bottom: 10px; }
+    .back-link {
+      font-family: var(--font); font-weight: 800; font-size: 0.82rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: #111;
+      text-decoration: none; display: inline-block;
+    }
+    .back-link:hover { opacity: 0.4; }
+
+    .filter-block { text-align: center; margin-bottom: 48px; }
+    .filter-label {
+      font-family: 'Open Sans', sans-serif; font-weight: 400;
+      font-size: 0.78rem; color: #111; margin-bottom: 6px; letter-spacing: 0.02em;
+    }
+    .sep { font-family: var(--font); font-weight: 800; font-size: clamp(0.95rem,1.4vw,1.15rem); color: #111; }
+    .filter-btn {
+      background: none; border: none; font-family: var(--font); font-weight: 800;
+      font-size: clamp(0.95rem,1.4vw,1.15rem); letter-spacing: 0.01em;
+      color: #bbb; cursor: pointer; padding: 0; transition: color 0.15s; display: inline;
+    }
+    .filter-btn:hover { color: #111; }
+    .filter-btn.active { color: #111; }
+
+    /* ── WORK GRID ── */
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px 28px;
+      margin-bottom: 80px;
+    }
+    .work-item { cursor: pointer; }
+    .work-item.hidden { display: none; }
+
+    /* THUMBNAIL — fixed ratio, image always fills and crops to fit */
+    .work-thumb {
+      width: 100%;
+      aspect-ratio: 3 / 2;        /* sve kartice isti omjer */
+      background: #e8e8e8;
+      overflow: hidden;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .work-thumb img,
+    .work-thumb video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;          /* uvijek popunjava, nikad bijeli rubovi */
+      object-position: center;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .work-item:hover .work-thumb img,
+    .work-item:hover .work-thumb video { transform: scale(1.04); }
+
+    .work-meta { display: flex; align-items: baseline; gap: 9px; }
+    .work-num {
+      font-family: var(--font); font-weight: 800; font-size: 0.72rem;
+      letter-spacing: 0.06em; color: #bbb; flex-shrink: 0;
+    }
+    .work-title {
+      font-family: var(--font); font-weight: 800;
+      font-size: clamp(0.82rem,1vw,0.96rem);
+      letter-spacing: 0.06em; text-transform: uppercase; color: #111;
+    }
+
+    /* ── WATERMARK ── */
+    .watermark {
+      font-family: var(--font); font-weight: 800;
+      font-size: calc(100vw / 5.5); letter-spacing: -0.01em;
+      text-transform: uppercase; color: #efefef;
+      user-select: none; pointer-events: none; line-height: 1;
+      margin-left: calc(-50vw + 50%); width: 100vw; display: block;
+    }
+    .copyright {
+      text-align: center; padding: 18px 0 40px;
+      font-family: 'Open Sans', sans-serif; font-size: 0.7rem; color: #ccc; letter-spacing: 0.04em;
+    }
+
+    /* ── POPUP ── */
+    #popup-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 20px;
+    }
+    #popup-overlay.open { opacity: 1; pointer-events: all; }
+
+    .popup {
+      background: #fff; width: 100%; max-width: 900px;
+      max-height: 90vh; overflow-y: auto; position: relative; padding: 48px 48px 40px;
+    }
+    .popup-close {
+      position: absolute; top: 20px; right: 24px; background: none; border: none;
+      font-family: var(--font); font-weight: 800; font-size: 1.1rem;
+      letter-spacing: 0.1em; cursor: pointer; color: #111; text-transform: uppercase;
+    }
+    .popup-close:hover { opacity: 0.4; }
+    .popup-num { font-family: var(--font); font-weight: 800; font-size: 0.75rem; letter-spacing: 0.1em; color: #bbb; margin-bottom: 6px; }
+    .popup-title { font-family: var(--font); font-weight: 800; font-size: clamp(1.4rem,3vw,2.2rem); letter-spacing: 0.06em; text-transform: uppercase; color: #111; margin-bottom: 6px; }
+    .popup-category { font-family: var(--font); font-weight: 800; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 40px; }
+
+    /* ── POPUP BODY — alternating text / image rows ── */
+    .popup-body { display: flex; flex-direction: column; gap: 56px; margin-bottom: 40px; }
+
+    .popup-block {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 44px; align-items: center;
+    }
+    .popup-block.no-text { grid-template-columns: 1fr; }
+
+    .popup-block-text {
+      font-family: 'Open Sans', sans-serif; font-size: 0.92rem;
+      line-height: 1.85; color: #555;
+    }
+
+    .popup-block-media { width: 100%; }
+
+    .popup-full-media { width: 100%; }
+    .popup-full-media .media-item { aspect-ratio: 16/9; }
+
+    .media-item { background: #e8e8e8; overflow: hidden; width: 100%; position: relative; }
+    .media-item img, .media-item video, .media-item iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center; display: block;
+    }
+    .media-item.portrait  { aspect-ratio: 3/4; }
+    .media-item.landscape { aspect-ratio: 16/9; }
+    .media-item.square    { aspect-ratio: 1/1; }
+    .media-item.video-vertical { aspect-ratio: 9/16; }
+
+    /* ── ADAPTIVE GALLERY ROWS (unlimited images) ──
+       Landscape items render full-width via .popup-full-media (existing).
+       Portrait / square / video items are grouped into rows of up to 3. */
+    .popup-gallery-row { display: grid; gap: 44px; align-items: start; }
+    .popup-gallery-row.cols-1 { grid-template-columns: 1fr; }
+    .popup-gallery-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .popup-gallery-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    /* ── YOUTUBE FACADE (click-to-load, avoids loading iframes upfront) ── */
+    .media-item .yt-facade { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; background: #111; }
+    .yt-play {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.92);
+      border: none; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .yt-play svg { width: 20px; height: 20px; fill: #111; margin-left: 2px; }
+    .yt-facade:hover .yt-play { transform: translate(-50%,-50%) scale(1.08); background: #fff; }
+
+    /* ── POPUP FOOTER — project info ── */
+    .popup-footer {
+      border-top: 1px solid #e8e8e8; padding-top: 24px; margin-top: 8px;
+      display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: 24px;
+    }
+    .popup-footer-label { font-family: var(--font); font-weight: 800; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: #bbb; margin-bottom: 5px; }
+    .popup-date { font-family: var(--font); font-weight: 800; font-size: 0.92rem; letter-spacing: 0.06em; color: #111; }
+    .popup-links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .popup-link {
+      font-family: var(--font); font-weight: 800; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #111; text-decoration: none;
+      border: 1px solid #ddd; padding: 5px 12px;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .popup-link:hover { background: #111; color: #fff; border-color: #111; }
+    .popup-link svg { width: 11px; height: 11px; fill: currentColor; flex-shrink: 0; }
+    .popup-socials-block { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .popup-socials { display: flex; gap: 14px; align-items: center; }
+    .popup-social { display: flex; align-items: center; color: #bbb; transition: color 0.15s; }
+    .popup-social:hover { color: #111; }
+    .popup-social svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) { .work-grid { grid-template-columns: repeat(2,1fr); gap: 24px 20px; } }
+    @media (max-width: 768px) {
+      .page { padding: 40px 20px 0; }
+      .work-grid { grid-template-columns: repeat(2,1fr); gap: 18px 14px; }
+      .watermark { font-size: calc(100vw / 4.2); }
+      .popup { padding: 36px 20px 28px; }
+      .popup-body { gap: 36px; margin-bottom: 32px; }
+      .popup-block { grid-template-columns: 1fr; gap: 18px; }
+      .popup-footer { grid-template-columns: 1fr; gap: 20px; }
+      .popup-socials-block { align-items: flex-start; }
+      .popup-gallery-row { gap: 14px; }
+      .popup-gallery-row.cols-3 { grid-template-columns: repeat(2, 1fr); }
+      .yt-play { width: 42px; height: 42px; }
+      .yt-play svg { width: 16px; height: 16px; }
+    }
+    @media (max-width: 480px) { .work-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <div id="loader"><div class="loader-logo">IVAN RENGEL</div></div>
+
+  <div id="popup-overlay">
+    <div class="popup">
+      <button class="popup-close" id="popup-close">✕</button>
+      <div class="popup-num"      id="popup-num"></div>
+      <div class="popup-title"    id="popup-title"></div>
+      <div class="popup-category" id="popup-category"></div>
+
+      <div class="popup-body" id="popup-body"></div>
+
+      <div class="popup-footer">
+        <div>
+          <div class="popup-footer-label">Godina</div>
+          <div class="popup-date" id="popup-date"></div>
+        </div>
+        <div id="popup-links-wrap">
+          <div class="popup-footer-label">Linkovi</div>
+          <div class="popup-links" id="popup-links"></div>
+        </div>
+        <div class="popup-socials-block" id="popup-socials-wrap">
+          <div class="popup-footer-label">Socials</div>
+          <div class="popup-socials" id="popup-socials"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="top-row">
+      <a href="hangar19-homepage.html" class="back-link">Back</a>
+    </div>
+    <div class="filter-block">
+      <div class="filter-label">Filter by:</div>
+      <div class="filter-line">
+        <button class="filter-btn active" data-filter="all">All work</button><span class="sep">, </span><button class="filter-btn" data-filter="brand">Brand &amp; Identity</button><span class="sep">, </span><button class="filter-btn" data-filter="content">Content &amp; Marketing</button><span class="sep">, </span><button class="filter-btn" data-filter="film">Film &amp; Documentary</button><span class="sep">, </span><button class="filter-btn" data-filter="web">Web &amp; Digital</button>
+      </div>
+    </div>
+
+    <!-- Grid se renderira iz JS-a -->
+    <div class="work-grid" id="work-grid"></div>
+
+    <p class="copyright">© 2026 Ivan Rengel. All rights reserved.</p>
+  </div>
+
+  <script>
+  // ══════════════════════════════════════════════════════════════
+  // PROJEKT DATA — jedino mjesto gdje mijenjate sve podatke
+  //
+  // thumb    → cover slika u gridu (i vrh popupa se NE koristi ovdje,
+  //            popup galerija kreće od media[1] nadalje kako se cover
+  //            ne bi ponavljao u galeriji)
+  //
+  // category → filter kategorija: 'brand' | 'content' | 'film' | 'web'
+  //
+  // media[]  → slike/videi za popup galeriju (NEOGRANIČEN broj unosa —
+  //            samo dodajte novi objekt u niz, redoslijed je bitan)
+  //   media[0]    = rezervni/cover unos — NE prikazuje se u popupu
+  //   media[1]    = prvi galerijski unos → tekst lijevo / slika desno
+  //   media[2]    = drugi galerijski unos → slika lijevo / tekst desno
+  //   media[3..]  = SVI ostali unosi automatski se slažu u adaptivnu
+  //                 galeriju ispod teksta:
+  //                   - orientation: 'landscape' → puna širina (1 po redu)
+  //                   - orientation: 'portrait'  → do 3 po redu
+  //                   - orientation: 'square'    → do 3 po redu
+  //                   - type: 'video'            → tretira se kao portret
+  //                                                 (YouTube Shorts su 9:16)
+  //                 Redoslijed diktira grupiranje — npr. 6 portreta zaredom
+  //                 = dva reda po 3, a portret odmah nakon landscape slike
+  //                 počinje novi red.
+  //
+  //   IMAGE:  { src: 'assets/img/x.jpg', type: 'img', orientation: 'landscape' | 'portrait' | 'square' }
+  //           (stari naziv polja 'ratio' i dalje radi — 'orientation' je samo noviji/preferirani naziv)
+  //   VIDEO:  { type: 'video', youtube: 'https://youtube.com/shorts/XXXXXXXX' }
+  //           (ili samo ID: { type: 'video', youtube: 'XXXXXXXX' })
+  //           Prikazuje se kao YouTube thumbnail s play gumbom — pravi
+  //           iframe se učitava tek na klik (brže učitavanje popupa).
+  //
+  // links[]  → gumbi u footer popupa: { label, url }
+  // socials[]→ ikone u footer popupa: { type, url }
+  //   type opcije: 'instagram' | 'facebook' | 'behance' | 'youtube' | 'tiktok'
+  // ══════════════════════════════════════════════════════════════
+  var projects = [
+    {
+      num: '01', title: 'Vinum Academicum', category: 'content',
+      thumb: 'assets/img/0-1-16.jpg',
+      date: '2026',
+      desc: 'Vinarija, smještena na obroncima Papuka u srcu Požeško-slavonske županije, prostire se na dva vinograda ukupne površine od 9 hektara, s više od 40.000 trsova. Zahvaljujući povoljnom položaju i predanom radu, nastaju vina koja odražavaju karakter terroira i bogatstvo slavonskog vinogorja.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: 'https://www.instagram.com/vinumacademicum/' },
+        { type: 'facebook',  url: 'https://www.facebook.com/profile.php?id=61573366985197' }
+      ],
+      media: [
+        { src: 'assets/img/0-1-16.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/_DSC0490.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC0526.jpg', type: 'img', ratio: 'portrait' },
+
+        { src: 'assets/img/_DSC2249.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC2124.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC2058.png', type: 'img', ratio: 'portrait' },
+
+        { src: 'assets/img/_DSC1764.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/_DSC2034-2.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/_DSC2145 (1).jpg', type: 'img', ratio: 'square' },
+
+        { src: 'assets/img/0-1-35.jpg', type: 'img', ratio: 'square' },
+        { src: 'assets/img/_DSC1791.png', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC1803.png', type: 'img', ratio: 'portrait' },
+
+        { src: 'assets/img/0-1-69 (1).jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-2.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/0-1-91.jpg', type: 'img', ratio: 'portrait' },
+       
+        
+      ]
+    },
+    {
+      num: '02', title: 'Pivnica Broko', category: 'content',
+      thumb: 'assets/img/0-1-57.jpg',
+      date: '2025',
+      desc: 'Za Pivnicu Broko razvio sam cjelokupnu kreativnu komunikaciju brenda kroz marketing, fotografiju, videoprodukciju i grafički dizajn s ciljem izgradnje prepoznatljivog identiteta na društvenim mrežama. Strategija sadržaja temeljila se na autentičnom, humorističnom i lokalno prepoznatljivom pristupu koji odgovara karakteru pivnice i njezinoj publici. Osmišljao sam i producirao zabavne kratke video formate, scenarije i kreativne koncepte prilagođene platformama poput Instagrama i TikToka, s naglaskom na organski doseg i dijeljiv sadržaj. Uz videoprodukciju, izrađivao sam profesionalne fotografije hrane, pića, interijera i atmosfere lokala, stvarajući vizualni sadržaj koji dosljedno predstavlja brend kroz sve komunikacijske kanale. Projekt je također uključivao izradu grafičkih materijala za digitalne i tiskane medije, uključujući promotivne vizuale, objave za društvene mreže, plakate, letke, jelovnike i ostale marketinške materijale, čime je osigurana konzistentna i prepoznatljiva vizualna komunikacija.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/0-1-57.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-62.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC2408.jpg', type: 'img', ratio: 'portrait' },
+
+        { src: 'assets/img/_DSC0071.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC1624.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC0192.jpg', type: 'img', ratio: 'landscape' },
+
+        { src: 'assets/img/_DSC2399.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/0-1-63.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC0079.jpg', type: 'img', ratio: 'landscape' },
+
+        { src: 'assets/img/_DSC1507.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/_DSC0095.jpg', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/0-1-64.jpg', type: 'img', ratio: 'landscape' },
+        
+      ]
+    },
+    {
+      num: '03', title: 'Tomica Đukić x FUTURRA', category: 'film',
+      thumb: 'assets/img/0-1-11.jpg',
+      date: '2026',
+      desc: 'Za suradnju Futurre i renomiranog executive chefa Tomice Đukića realizirao sam profesionalnu fotografsku produkciju sadržaja tijekom edukacijskog programa namijenjenog studentima smjerova Enogastronomija i Turizam. Projekt je obuhvatio dokumentiranje tri stručna predavanja i pripremu ukupno petnaest internacionalnih jela, s fokusom na kvalitetnu prezentaciju gastronomije, procesa pripreme i atmosfere događaja. Kroz kombinaciju detaljnih food fotografija, dokumentarnih kadrova i fotografija predavača i sudionika, sadržaj je prilagođen za objavu na društvenim mrežama, webu i promotivnim materijalima. Poseban naglasak stavljen je na autentičnost, estetiku prezentacije hrane i vizualno pripovijedanje događaja, čime je istaknuta stručnost predavača i vrijednost edukacije.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/0-1-11.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1 (1).jpg', type: 'img', ratio: 'square' },
+        { src: 'assets/img/0-1-15.jpg', type: 'img', ratio: 'square' },
+
+        { src: 'assets/img/1.png', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/2.png', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/3.png', type: 'img', ratio: 'portrait' },
+
+        { src: 'assets/img/0-1-61.jpg', type: 'img', ratio: 'landscape' },
+      ]
+    },
+    {
+      num: '04', title: 'UNIOS', category: 'film',
+      thumb: 'assets/img/unios.jpg',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/unios.jpg', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '05', title: 'Soba 23 street food', category: 'content',
+      thumb: 'assets/img/Soba23.png',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'facebook',  url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Soba23.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'square' },
+        { src: '', type: 'img', ratio: 'square' }
+      ]
+    },
+    {
+      num: '06', title: 'Inhof logistika', category: 'brand',
+      thumb: 'assets/img/ads (1).png',
+      date: '2023',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/ads (1).png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '07', title: 'FUTURRA', category: 'film',
+      thumb: 'assets/img/_DSC0225.jpg',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'portrait' },
+        { src: '', type: 'img', ratio: 'portrait' }
+      ]
+    },
+    {
+      num: '08', title: "En Priméur 25'", category: 'film',
+      thumb: 'assets/img/en-primeur.png',
+      date: '2025',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/en-primeur.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'square' }
+      ]
+    },
+    {
+      num: '09', title: 'Postolar Varga', category: 'content',
+      thumb: 'assets/img/varga.png',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/varga.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'portrait' },
+        { src: '', type: 'img', ratio: 'portrait' }
+      ]
+    },
+    {
+      num: '10', title: "WineOs 26'", category: 'film',
+      thumb: 'assets/img/wineos.png',
+      date: '2026',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/wineos.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '11', title: 'La Medussa', category: 'content',
+      thumb: 'assets/img/lamedusa.png',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'facebook',  url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/lamedusa.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'square' },
+        { src: '', type: 'img', ratio: 'square' }
+      ]
+    },
+    {
+      num: '12', title: 'Thera fireplaces', category: 'brand',
+      thumb: 'assets/img/Thera.png',
+      date: '2024',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Thera.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'square' }
+      ]
+    },
+    {
+      num: '13', title: 'Dubioza rent-a-bar', category: 'web',
+      thumb: 'assets/img/Dubioza.png',
+      date: '2025',
+      desc: 'Kratki opis projekta.',
+      links: [
+        { label: 'Web stranica', url: '#' }
+      ],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Dubioza.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '14', title: 'Omega Concept Bar', category: 'content',
+      thumb: 'assets/img/Omega.png',
+      date: '2025',
+      desc: 'Kratki opis projekta.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'facebook',  url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Omega.png', type: 'img', ratio: 'landscape' },
+        { src: '', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '15', title: 'Boom burgers & bbq', category: 'content',
+      thumb: 'assets/img/Boom.png',
+      date: '2025',
+      desc: 'Za Boom Burgers osmislio sam i producirao kreativni promotivni video inspiriran estetikom vintage BBQ novina, spajajući storytelling, food content i dinamičnu montažu u prepoznatljiv vizualni koncept. Cilj je bio predstaviti ponudu restorana kroz sadržaj koji odmah privlači pažnju na društvenim mrežama i razlikuje se od klasičnih food reklama. Kombinacijom detaljnih kadrova hrane, grafičkih elemenata inspiriranih novinskim dizajnom i brzog ritma montaže stvoren je video koji naglašava kvalitetu proizvoda i karakter brenda. Projekt je obuhvatio razvoj kreativnog koncepta, planiranje kadrova, snimanje, montažu te završnu kolor korekciju i motion grafiku kako bi konačni sadržaj bio optimiziran za digitalne platforme.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'tiktok',    url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Boom.png', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/gif4.gif', type: 'img', ratio: 'portrait' },
+        { src: 'assets/img/gif5.gif', type: 'img', ratio: 'portrait' }
+      ]
+    },
+    {
+      num: '16', title: 'Ring Room', category: 'brand',
+      thumb: 'assets/img/rr_logo.png',
+      date: '2024',
+      desc: 'Za Ring Room razvio sam vizualni identitet koji povezuje karakter borilačkog sporta s modernim, snažnim i prepoznatljivim vizualnim jezikom. Cilj je bio stvoriti brend koji ne djeluje generički poput klasičnih fitness i borilačkih klubova, već ima vlastiti karakter i jasnu vizualnu prisutnost. Branding sam gradio kroz logotip, tipografiju, kolor paletu i sustav vizualnih elemenata koji se mogu dosljedno primjenjivati kroz društvene mreže, promotivne materijale, odjeću i fizički prostor. Poseban fokus stavljen je na jednostavnost i prepoznatljivost identiteta, kako bi vizualni sustav jednako dobro funkcionirao na velikim formatima, poput signalizacije i zidnih grafika, kao i na digitalnim platformama.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'youtube',   url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/RingRoom.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/ringroom1.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/RingRoom.png', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '17', title: 'Liros rent-a-boat', category: 'content',
+      thumb: 'assets/img/Liros.png',
+      date: '2025',
+      desc: 'Fokus je bio na stvaranju sadržaja koji kroz fotografiju, video i storytelling prenosi osjećaj slobode, ljeta i premium iskustva na moru. Umjesto klasične komunikacije temeljene isključivo na fotografijama broda, sadržaj sam gradio oko trenutaka koje korisnik može doživjeti tijekom plovidbe — od izlaska na more i skrivenih lokacija do druženja, zalazaka sunca i spontanih ljetnih trenutaka. Kroz kratke video formate, lifestyle fotografiju i kreativne social media koncepte osmislio sam komunikaciju koja Liros pozicionira kao iskustvo, a ne samo uslugu najma broda.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Liros.png', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/liros_dm.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/gif3.gif', type: 'img', ratio: 'portrait' }
+      ]
+    },
+    {
+      num: '18', title: 'Branding of Vinum Academicum', category: 'brand',
+      thumb: 'assets/img/va_hero.png',
+      date: '2026',
+      desc: 'Vinum Academicum nastao je s idejom da vino predstavi kao više od proizvoda – kao iskustvo, kulturu i priču koja povezuje ljude. Vizualni identitet razvijen je kako bi odražavao eleganciju, autentičnost i bezvremenski karakter brenda, uz minimalistički pristup koji stavlja naglasak na kvalitetu i prepoznatljivost. Projekt je obuhvatio razvoj cjelokupnog identiteta brenda, uključujući logotip, tipografiju, paletu boja, novi dizajn limited edition pakiranja te sustav vizualne komunikacije primjenjiv na svim tiskanim i digitalnim materijalima. Posebna pažnja posvećena je ravnoteži između klasičnih vinskih vrijednosti i modernog estetskog izričaja, stvarajući identitet koji se ističe na polici, ali ostaje sofisticiran i nenametljiv. Rezultat je vizualni sustav koji prenosi povjerenje, premium kvalitetu i karakter vina, pružajući brendu snažnu i dosljednu prisutnost kroz svaku dodirnu točku s kupcem.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'tiktok',    url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Boom.png', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/gif.gif', type: 'img', ratio: 'square' },
+        { src: 'assets/img/va_rollup.png', type: 'img', ratio: 'square' }
+      ]
+    },
+    {
+      num: '19', title: 'Rootoos healthy veggie chips', category: 'brand',
+      thumb: 'assets/img/rootooshero.jpg',
+      date: '2025',
+      desc: 'Rootoos je brend zdravog dječjeg snacka izrađenog od dehidriranog povrća, razvijen s ciljem da zdraviju prehranu približi djeci kroz razigran i privlačan vizualni identitet. Projekt je obuhvaćao razvoj brenda te dizajn kartonskog tuljka kao primarne ambalaže proizvoda. Poseban naglasak stavljen je na funkcionalnost ambalaže i usklađenost s važećim europskim propisima o označavanju hrane. Dizajn je razvijen u skladu sa zahtjevima Uredbe (EU) br. 1169/2011 o informiranju potrošača o hrani, uz pravilno definiranu hijerarhiju informacija, čitljivost deklaracije, minimalne veličine tipografije te jasno istaknute obvezne podatke poput sastojaka, nutritivnih vrijednosti, alergena, neto količine, roka trajanja, podataka proizvođača i uvjeta čuvanja. Osim zakonskih zahtjeva, ambalaža je osmišljena uzimajući u obzir principe HACCP sustava, kako bi podržavala sigurnost hrane kroz pravilno označavanje, sljedivost proizvoda i jasno komuniciranje svih važnih informacija krajnjem korisniku. Vizualni identitet prilagođen je dječjoj publici kroz vesele ilustracije, prijateljske boje i jednostavne grafičke elemente, dok su tipografija i raspored sadržaja optimizirani za lako čitanje i brzo razumijevanje od strane roditelja. Cilj je bio spojiti razigran karakter brenda s profesionalnim pristupom dizajnu prehrambene ambalaže.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: '#' },
+        { type: 'tiktok',    url: '#' }
+      ],
+      media: [
+        { src: 'assets/img/Rootoos.png', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/Rootoos.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/rootproizvod.jpg', type: 'img', ratio: 'square' },
+        { src: 'assets/img/gif1.gif', type: 'img', ratio: 'landscape' }
+      ]
+    },
+    {
+      num: '19', title: 'Dubioza rent-a-bar branding', category: 'brand',
+      thumb: 'assets/img/dubiozalogo.png',
+      date: '2024',
+      desc: 'Dubioza Rent a Bar je prostor namijenjen privatnim proslavama, gdje se opuštena atmosfera susreće s modernim dizajnom. Vizualni identitet razvijen je s ciljem da prenese energiju zabave, noćnog života i druženja, zadržavajući pritom čist i profesionalan izgled. Središnji element logotipa, disco kugla, simbolizira glazbu, ples i nezaboravne trenutke, dok minimalistička tipografija osigurava prepoznatljivost na svim kanalima – od digitalnih platformi do fizičke signalizacije i promotivnih materijala. Brending je osmišljen kako bi Dubioza Rent a Bar pozicionirao kao mjesto kojem se ljudi vraćaju kada žele proslaviti rođendan, organizirati privatnu zabavu ili okupiti društvo u vlastitom prostoru.',
+      links: [],
+      socials: [
+        { type: 'instagram', url: 'https://www.instagram.com/dubioza_rentabar/' },
+        { type: 'tiktok',    url: 'https://www.facebook.com/dubioza.bar/?locale=hr_HR' }
+      ],
+      media: [
+        { src: 'assets/img/vizitkedubioza.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/dubiozapromo.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/vizitkedubioza.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/vizitkedubioza.png', type: 'img', ratio: 'landscape' }
+      ]
+    }
+  ];
+
+  // ── SVG ICONS ──
+  var ICONS = {
+    instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>',
+    facebook:  '<svg viewBox="0 0 24 24"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>',
+    behance:   '<svg viewBox="0 0 24 24"><path d="M6.938 4.503c.702 0 1.34.06 1.92.188.577.13 1.07.33 1.485.61.41.28.733.65.96 1.12.225.47.34 1.05.34 1.73 0 .74-.17 1.36-.507 1.86-.338.5-.837.9-1.502 1.22.906.26 1.576.72 2.022 1.37.448.66.665 1.45.665 2.36 0 .75-.13 1.39-.41 1.93-.28.55-.67 1-1.155 1.36-.486.37-1.055.64-1.71.8-.657.17-1.36.25-2.11.25H0V4.51h6.938v-.007zM16.94 4.5h6.54v1.56H16.94V4.5zm-10.1 4.5H3.5v3.03h3.34c.49 0 .893-.1 1.216-.3.32-.2.48-.54.48-1.01 0-.52-.16-.87-.48-1.06-.32-.2-.72-.29-1.216-.29V9zM16.96 8.33c-.92 0-1.64.25-2.17.73-.52.49-.82 1.16-.9 2.01h5.82c-.07-.87-.36-1.54-.89-2.02-.52-.47-1.18-.72-1.86-.72zM3.5 14.66h3.84c.55 0 1.02-.12 1.37-.36.36-.24.54-.64.54-1.2 0-.3-.06-.55-.18-.75-.11-.2-.27-.36-.47-.48-.2-.12-.43-.2-.69-.25-.26-.04-.53-.07-.82-.07H3.5v3.11zm13.5.5c.87 0 1.59-.24 2.13-.7.54-.47.86-1.15.97-2.07H17c.07.87.32 1.53.78 1.97.45.44 1.02.66 1.72.66V15.16h-.5z"/></svg>',
+    youtube:   '<svg viewBox="0 0 24 24"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>',
+    tiktok:    '<svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>'
+  };
+
+  // ── RENDER GRID ──
+  var grid = document.getElementById('work-grid');
+  projects.forEach(function(p, i) {
+    var item = document.createElement('div');
+    item.className = 'work-item';
+    item.setAttribute('data-category', p.category);
+    item.setAttribute('data-index', i);
+
+    var thumbInner = p.thumb
+      ? '<img src="' + p.thumb + '" alt="' + p.title + '" />'
+      : '';
+
+    item.innerHTML =
+      '<div class="work-thumb">' + thumbInner + '</div>' +
+      '<div class="work-meta">' +
+        '<span class="work-num">' + p.num + '</span>' +
+        '<span class="work-title">' + p.title + '</span>' +
+      '</div>';
+
+    grid.appendChild(item);
+  });
+
+  // ── LOADER ──
+  setTimeout(function() {
+    document.getElementById('loader').classList.add('hidden');
+  }, 800);
+
+  // ── FILTER ──
+  var filterBtns = document.querySelectorAll('.filter-btn');
+
+  filterBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      filterBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var filter = btn.getAttribute('data-filter');
+      var counter = 1;
+      document.querySelectorAll('.work-item').forEach(function(item) {
+        var cat = item.getAttribute('data-category');
+        if (filter === 'all' || cat === filter) {
+          item.classList.remove('hidden');
+          item.querySelector('.work-num').textContent = String(counter).padStart(2, '0');
+          counter++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // ── POPUP ──
+  var overlay          = document.getElementById('popup-overlay');
+  var popupBody         = document.getElementById('popup-body');
+  var popupLinksWrap    = document.getElementById('popup-links-wrap');
+  var popupSocialsWrap  = document.getElementById('popup-socials-wrap');
+
+  // Vraća orijentaciju media unosa: 'orientation' je preferirano polje,
+  // 'ratio' ostaje podržan zbog postojećih podataka. Video (YouTube Shorts)
+  // tretira se kao portret jer je format vertikalan (9:16).
+  function getOrientation(m, fallback) {
+    if (!m) return fallback || 'landscape';
+    if (m.type === 'video') return 'portrait';
+    return m.orientation || m.ratio || fallback || 'landscape';
+  }
+
+  // Izvlači YouTube video ID iz pune Shorts/watch/embed URL-a ili iz golog ID-a
+  function extractYoutubeId(input) {
+    if (!input) return '';
+    var s = String(input).trim();
+    var match = s.match(/(?:shorts\/|watch\?v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{6,})/);
+    if (match) return match[1];
+    return s.replace(/^\/+|\/+$/g, '');
+  }
+
+  // Klik-za-pokretanje YouTube facade — prikazuje thumbnail + play gumb,
+  // pravi iframe učitava tek na klik radi bolje performanse popupa.
+  function buildYoutubeFacade(m, altText) {
+    var id = extractYoutubeId(m.youtube || m.src);
+    var facade = document.createElement('div');
+    facade.className = 'yt-facade';
+
+    var thumb = document.createElement('img');
+    thumb.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    thumb.alt = altText || '';
+    thumb.loading = 'lazy';
+    facade.appendChild(thumb);
+
+    var playBtn = document.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'yt-play';
+    playBtn.setAttribute('aria-label', 'Play video');
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    facade.appendChild(playBtn);
+
+    facade.addEventListener('click', function loadVideo() {
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1';
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.loading = 'lazy';
+      iframe.title = altText || 'YouTube video';
+      facade.innerHTML = '';
+      facade.appendChild(iframe);
+      facade.removeEventListener('click', loadVideo);
+    });
+
+    return facade;
+  }
+
+  // Kreira jedan media-item element (sliku/video ili sivi placeholder)
+  function buildMediaItem(m, fallbackRatio, altText) {
+    var div = document.createElement('div');
+
+    if (m && m.type === 'video') {
+      div.className = 'media-item video-vertical';
+      div.appendChild(buildYoutubeFacade(m, altText));
+      return div;
+    }
+
+    var ratio = getOrientation(m, fallbackRatio);
+    div.className = 'media-item ' + ratio;
+    if (m && m.src) {
+      var img = document.createElement('img');
+      img.src = m.src; img.alt = altText || ''; img.loading = 'lazy';
+      div.appendChild(img);
+    }
+    return div;
+  }
+
+  // Slaže NEOGRANIČEN niz media unosa u adaptivnu galeriju:
+  // landscape → puna širina, portrait/square/video → grupirani do 3 po redu.
+  function renderAdaptiveGallery(items, container, altText) {
+    var i = 0;
+    while (i < items.length) {
+      var orient = getOrientation(items[i]);
+
+      if (orient === 'landscape') {
+        var fullRow = document.createElement('div');
+        fullRow.className = 'popup-full-media';
+        fullRow.appendChild(buildMediaItem(items[i], 'landscape', altText));
+        container.appendChild(fullRow);
+        i++;
+        continue;
+      }
+
+      var bucket = [];
+      while (i < items.length && bucket.length < 3 && getOrientation(items[i]) !== 'landscape') {
+        bucket.push(items[i]);
+        i++;
+      }
+      var galleryRow = document.createElement('div');
+      galleryRow.className = 'popup-gallery-row cols-' + bucket.length;
+      bucket.forEach(function(bm) {
+        galleryRow.appendChild(buildMediaItem(bm, 'portrait', altText));
+      });
+      container.appendChild(galleryRow);
+    }
+  }
+
+  // Dijeli opis na dva dijela (za dva teksualna bloka pored slika)
+  function splitDesc(desc) {
+    var sentences = (desc || '').match(/[^.!?]+[.!?]*/g);
+    sentences = sentences ? sentences.map(function(s){ return s.trim(); }).filter(Boolean) : [];
+    if (sentences.length <= 1) return [desc || '', ''];
+    var mid = Math.ceil(sentences.length / 2);
+    return [
+      sentences.slice(0, mid).join(' ').trim(),
+      sentences.slice(mid).join(' ').trim()
+    ];
+  }
+
+  function openPopup(index) {
+    var p = projects[index];
+    document.getElementById('popup-num').textContent      = p.num;
+    document.getElementById('popup-title').textContent    = p.title;
+    document.getElementById('popup-category').textContent = p.category.replace('brand','Brand & Identity').replace('content','Content & Marketing').replace('film','Film & Documentary').replace('web','Web & Digital');
+    document.getElementById('popup-date').textContent     = p.date || '—';
+
+    // Links
+    var linksEl = document.getElementById('popup-links');
+    linksEl.innerHTML = '';
+    if (p.links && p.links.length) {
+      p.links.forEach(function(lnk) {
+        var a = document.createElement('a');
+        a.href = lnk.url; a.className = 'popup-link';
+        a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.innerHTML = '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;stroke:none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' + lnk.label;
+        linksEl.appendChild(a);
+      });
+      popupLinksWrap.style.display = '';
+    } else {
+      popupLinksWrap.style.display = 'none';
+    }
+
+    // Socials
+    var socialsEl = document.getElementById('popup-socials');
+    socialsEl.innerHTML = '';
+    if (p.socials && p.socials.length) {
+      p.socials.forEach(function(s) {
+        var a = document.createElement('a');
+        a.href = s.url; a.className = 'popup-social';
+        a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.setAttribute('aria-label', s.type);
+        a.innerHTML = ICONS[s.type] || '';
+        socialsEl.appendChild(a);
+      });
+      popupSocialsWrap.style.display = '';
+    } else {
+      popupSocialsWrap.style.display = 'none';
+    }
+
+    // ── BODY: tekst/slika naizmjenično + jedna landscape slika ──
+    // media[0] je cover (ista slika kao thumbnail) — namjerno se preskače
+    // kako se ne bi ponavljala unutar popup galerije.
+    popupBody.innerHTML = '';
+    var gallery = (p.media || []).slice(1);
+    var img1 = gallery[0];
+    var img2 = gallery[1];
+    var rest = gallery.slice(2); // NEOGRANIČENO — sve ostalo ide u adaptivnu galeriju
+    var parts = splitDesc(p.desc);
+
+    // Red A — tekst lijevo / slika desno
+    if (parts[0] || img1) {
+      var rowA = document.createElement('div');
+      rowA.className = 'popup-block' + (parts[0] ? '' : ' no-text');
+      if (parts[0]) {
+        var textA = document.createElement('div');
+        textA.className = 'popup-block-text';
+        textA.textContent = parts[0];
+        rowA.appendChild(textA);
+      }
+      var mediaWrapA = document.createElement('div');
+      mediaWrapA.className = 'popup-block-media';
+      mediaWrapA.appendChild(buildMediaItem(img1, 'square', p.title));
+      rowA.appendChild(mediaWrapA);
+      popupBody.appendChild(rowA);
+    }
+
+    // Red B — slika lijevo / tekst desno (zrcaljeno)
+    if (parts[1] || img2) {
+      var rowB = document.createElement('div');
+      rowB.className = 'popup-block' + (parts[1] ? '' : ' no-text');
+      var mediaWrapB = document.createElement('div');
+      mediaWrapB.className = 'popup-block-media';
+      mediaWrapB.appendChild(buildMediaItem(img2, 'square', p.title));
+      rowB.appendChild(mediaWrapB);
+      if (parts[1]) {
+        var textB = document.createElement('div');
+        textB.className = 'popup-block-text';
+        textB.textContent = parts[1];
+        rowB.appendChild(textB);
+      }
+      popupBody.appendChild(rowB);
+    }
+
+    // Adaptivna galerija — svi preostali unosi (neograničeno), grupirani
+    // prema orijentaciji: landscape puna širina, portrait/square/video do 3 po redu
+    if (rest.length) {
+      renderAdaptiveGallery(rest, popupBody, p.title);
+    }
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePopup() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    popupBody.querySelectorAll('video').forEach(function(v){ v.pause(); });
+  }
+
+  // Click on grid items — delegated since grid is dynamic
+  grid.addEventListener('click', function(e) {
+    var item = e.target.closest('.work-item');
+    if (item) openPopup(parseInt(item.getAttribute('data-index')));
+  });
+
+  document.getElementById('popup-close').addEventListener('click', closePopup);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closePopup(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePopup(); });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ivan Rengel — Info</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --font: 'Open Sans Condensed', 'Open Sans', Arial Narrow, sans-serif; }
+
+    body {
+      background: #fff;
+      color: #111;
+      font-family: 'Open Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* LOADER */
+    #loader {
+      position: fixed; inset: 0;
+      background: #000; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.7s ease;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-logo {
+      font-family: var(--font); font-weight: 800;
+      font-size: clamp(2rem, 6vw, 5rem);
+      color: #fff; letter-spacing: 0.08em; text-transform: uppercase;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* PAGE */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 48px 0;
+    }
+
+    /* BACK */
+    .back-link {
+      display: inline-block;
+      font-family: var(--font); font-weight: 800;
+      font-size: 0.82rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #111;
+      text-decoration: none; margin-bottom: 40px;
+    }
+    .back-link:hover { opacity: 0.4; }
+
+    /* TOP SECTION: image + text */
+    .info-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+      align-items: start;
+    }
+    .info-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #e8e8e8;
+      overflow: hidden;
+    }
+    .info-image img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .info-text h2 {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      color: #111;
+    }
+    .info-text p {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: #111;
+    }
+
+    /* SERVICES TABLE */
+    .services-label {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #111;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #111;
+      margin-bottom: 0;
+    }
+
+    .service-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      border-bottom: 1px solid #ddd;
+      padding: 14px 0;
+      gap: 24px;
+    }
+    .service-name {
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      letter-spacing: 0.01em;
+      color: #111;
+      line-height: 1.1;
+    }
+    .service-items {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 0.78rem;
+      line-height: 1.9;
+      color: #111;
+      padding-top: 6px;
+    }
+
+    /* WATERMARK + COPYRIGHT */
+    .watermark {
+      font-family: var(--font); font-weight: 800;
+      font-size: calc(100vw / 5.5);
+      letter-spacing: -0.01em; text-transform: uppercase;
+      color: #efefef; user-select: none; pointer-events: none;
+      line-height: 1; display: block;
+      margin-left: calc(-50vw + 50%);
+      width: 100vw; text-align: center;
+      margin-top: 60px;
+    }
+    .copyright {
+      text-align: center; padding: 18px 0 40px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.7rem; color: #ccc; letter-spacing: 0.04em;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .page { padding: 36px 20px 0; }
+      .info-top { grid-template-columns: 1fr; gap: 28px; }
+      .service-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
+      .service-name { font-size: 1.5rem; }
+      .watermark { font-size: calc(100vw / 4.2); margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader"><div class="loader-logo">IVAN RENGEL</div></div>
+
+  <div class="page">
+
+    <a href="hangar19-homepage.html" class="back-link">Back</a>
+
+    <!-- Top: image + who we are -->
+    <div class="info-top">
+      <div class="info-image">
+        <!-- <img src="your-image.jpg" alt="Hangar 19"> -->
+      </div>
+      <div class="info-text">
+        <h2>O meni</h2>
+        <p>Hangar 19 je kreativna agencija koja kroz foto i video produkciju, marketing i digitalna rješenja pomaže brendovima ispričati svoju priču i ostvariti prepoznatljivost. Surađujemo s tvrtkama i pojedincima iz različitih industrija – od ugostiteljstva i beauty sektora do vinarija, proizvodnih obrta i luksuznih brendova – stvarajući sadržaj koji ostavlja dojam i donosi rezultate.</p>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="services-label">Usluge</div>
+
+    <div class="service-row">
+      <div class="service-name">Brand &amp; Identity</div>
+      <div class="service-items">
+        Izrada logotipa<br>
+        Definiranje identiteta i vrijednosti<br>
+        Ton komunikacije
+      </div>
+    </div>
+
+    <div class="service-row">
+      <div class="service-name">Content &amp; Marketing</div>
+      <div class="service-items">
+        Digitalni marketing<br>
+        Kreiranje sadržaja<br>
+        Kampanje i oglasi
+      </div>
+    </div>
+
+    <div class="service-row">
+      <div class="service-name">Web &amp; Digital</div>
+      <div class="service-items">
+        Dizajn web stranica<br>
+        Izrada web stranica<br>
+        Optimizacija web stranica
+      </div>
+    </div>
+
+    <div class="service-row">
+      <div class="service-name">Film &amp; Documentary</div>
+      <div class="service-items">
+        Event video / Korporacijski video<br>
+        Sadržaj za društvene mreže<br>
+        Intervju / Dokumentarni videi
+      </div>
+    </div>
+
+    <div class="service-row">
+      <div class="service-name">Real estate photo &amp; video</div>
+      <div class="service-items">
+        Exterior / Interior video<br>
+        Exterior / Interior photo<br>
+        Aerial photo / video
+      </div>
+    </div>
+
+    <div class="service-row">
+      <div class="service-name">PR &amp; more</div>
+      <div class="service-items">
+        Exterior / Interior video<br>
+        Exterior / Interior photo<br>
+        Aerial photo / video
+      </div>
+    </div>
+
+    <p class="copyright">© 2026 Ivan Rengel. All rights reserved.</p>
+
+  </div>
+
+  <script>
+    setTimeout(function(){ document.getElementById('loader').classList.add('hidden'); }, 800);
+  </script>
+</body>
+</html>
