@@ -302,6 +302,14 @@
   //           Prikazuje se kao YouTube thumbnail s play gumbom — pravi
   //           iframe se učitava tek na klik (brže učitavanje popupa).
   //
+  //           Orijentacija videa (opcionalno polje 'orientation'):
+  //             - izostavljeno ili 'portrait'  → vertikalan video / Shorts (9:16),
+  //                                               grupira se do 3 u red
+  //             - 'landscape'                  → horizontalan video (16:9),
+  //                                               puna širina, 1 po redu
+  //           npr. horizontalni video:
+  //           { type: 'video', youtube: 'XXXXXXXX', orientation: 'landscape' }
+  //
   // links[]  → gumbi u footer popupa: { label, url }
   // socials[]→ ikone u footer popupa: { type, url }
   //   type opcije: 'instagram' | 'facebook' | 'behance' | 'youtube' | 'tiktok'
@@ -326,7 +334,7 @@
         { src: 'assets/img/_DSC2124.jpg', type: 'img', ratio: 'portrait' },
         { src: 'assets/img/_DSC2058.png', type: 'img', ratio: 'portrait' },
 
-        { src: 'assets/img/_DSC1764.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/_DSC0378.jpg', type: 'img', ratio: 'landscape' },
         { src: 'assets/img/_DSC2034-2.png', type: 'img', ratio: 'square' },
         { src: 'assets/img/_DSC2145 (1).jpg', type: 'img', ratio: 'square' },
 
@@ -395,7 +403,7 @@
       num: '04', title: 'UNIOS', category: 'film',
       thumb: 'assets/img/unios.jpg',
       date: '2024',
-      desc: 'Kratki opis projekta.',
+      desc: 'Za manifestaciju SciArt Požega – Dani znanosti i umjetnosti, organiziranu od strane Sveučilišta Josipa Jurja Strossmayera u Osijeku u suradnji s Fakultetom turizma i ruralnog razvoja u Požegi, realizirao sam profesionalnu fotografsku produkciju događaja s ciljem dokumentiranja jednog od najvećih edukativno-popularizacijskih događanja posvećenih znanosti i umjetnosti. Projekt je obuhvatio fotografiranje interaktivnih radionica, znanstvenih eksperimenata, umjetničkih sadržaja, predavanja i atmosfere tijekom cijelog događaja. Fokus je bio na autentičnom vizualnom prikazu interakcije između izlagača i posjetitelja te stvaranju kvalitetnog sadržaja za potrebe Sveučilišta, fakulteta i promotivnih komunikacijskih kanala. Fotografije su prilagođene za objavu na web stranicama, društvenim mrežama i drugim promotivnim materijalima, uz naglasak na dokumentiranje značaja manifestacije koja okuplja znanstvenike, istraživače, umjetnike, studente i više od 500 sudionika s ciljem popularizacije znanosti i umjetnosti među širom javnošću.',
       links: [],
       socials: [
         { type: 'instagram', url: '#' },
@@ -403,15 +411,18 @@
       ],
       media: [
         { src: 'assets/img/unios.jpg', type: 'img', ratio: 'landscape' },
-        { src: '', type: 'img', ratio: 'landscape' },
-        { src: '', type: 'img', ratio: 'landscape' }
+        { src: 'assets/img/0-1-18.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-104.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-40.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-143.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/0-1-122.jpg', type: 'img', ratio: 'landscape' },
       ]
     },
     {
       num: '05', title: 'Soba 23 street food', category: 'content',
       thumb: 'assets/img/Soba23.png',
       date: '2024',
-      desc: 'Kratki opis projekta.',
+      desc: 'Za Soba 23 Street Food vodio sam cjelokupnu digitalnu komunikaciju brenda kroz marketing, upravljanje društvenim mrežama, produkciju sadržaja i svakodnevnu komunikaciju s publikom. Projekt je zahtijevao kontinuiranu dostupnost i brzu reakciju zbog svakodnevnih promjena ponude i dnevnih menija. Kreirao sam vizuale, fotografije, video sadržaj i objave u stvarnom vremenu kako bi informacije o aktualnoj ponudi bile pravovremeno objavljene i vizualno privlačne. Uz redovitu produkciju sadržaja, planirao sam komunikaciju, prilagođavao objave sezonskim ponudama i promovirao nove proizvode, akcije i događanja. Kroz profesionalnu fotografiju hrane, kratke video formate i dosljedan vizualni identitet izgrađena je prepoznatljiva prisutnost brenda na društvenim mrežama, uz sadržaj koji istovremeno informira i potiče korisnike na posjet restoranu. Projekt je uključivao svakodnevno upravljanje društvenim mrežama, izradu promotivnih materijala, planiranje marketinških aktivnosti te održavanje stalne komunikacije s klijentom kako bi se svaka promjena u ponudi mogla brzo i učinkovito prenijeti publici.',
       links: [],
       socials: [
         { type: 'instagram', url: '#' },
@@ -419,29 +430,33 @@
       ],
       media: [
         { src: 'assets/img/Soba23.png', type: 'img', ratio: 'landscape' },
-        { src: '', type: 'img', ratio: 'square' },
-        { src: '', type: 'img', ratio: 'square' }
+        { src: 'assets/img/_DSC0368.jpg', type: 'img', ratio: 'square' },
+        { src: 'assets/img/_DSC2618.jpg', type: 'img', ratio: 'square' },
+        { src: 'assets/img/užitak.png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/užitak (1).png', type: 'img', ratio: 'square' },
+        { src: 'assets/img/užitak (2).png', type: 'img', ratio: 'square' }
       ]
     },
     {
       num: '06', title: 'Inhof logistika', category: 'brand',
       thumb: 'assets/img/ads (1).png',
       date: '2023',
-      desc: 'Kratki opis projekta.',
+      desc: 'Za tvrtku Inhof d.o.o., specijaliziranu za skladištenje i prijevoz, razvili smo kompletan vizualni identitet s fokusom na pouzdanost, organiziranost i profesionalnost. Projekt je obuhvatio redizajn i razvoj logotipa, definiranje vizualnog smjera, tipografije, palete boja te izradu osnovnih elemenata brenda. Cilj je bio stvoriti moderan i prepoznatljiv identitet koji jasno komunicira djelatnost tvrtke, ali istovremeno ostavlja prostor za njezin daljnji razvoj. Vizualni identitet prilagođen je primjeni na različitim materijalima i komunikacijskim kanalima — od poslovnih materijala i digitalnih kanala do vozila i drugih elemenata koji predstavljaju brend u svakodnevnom poslovanju.',
       links: [],
       socials: [
         { type: 'instagram', url: '#' }
       ],
       media: [
         { src: 'assets/img/ads (1).png', type: 'img', ratio: 'landscape' },
-        { src: '', type: 'img', ratio: 'landscape' }
+        { src: 'assets/img/logoinhof.png', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/inhof.png', type: 'img', ratio: 'landscape' }
       ]
     },
     {
       num: '07', title: 'FUTURRA', category: 'film',
       thumb: 'assets/img/_DSC0225.jpg',
       date: '2024',
-      desc: 'Kratki opis projekta.',
+      desc: 'Za Fakultet turizma i ruralnog razvoja realizirali smo kompletnu foto i video produkciju s ciljem stvaranja autentičnog vizualnog prikaza fakulteta, njegovih studijskih programa i studentskog života. Produkcija je obuhvatila snimanje promotivnog filma o fakultetu, fotografiranje prostora, studenata i aktivnosti te izradu vizualnog sadržaja za daljnju komunikaciju fakulteta. Fokus je bio na prirodnom i modernom prikazu fakulteta — od akademskog okruženja i praktične nastave do ljudi i atmosfere koja ga čini prepoznatljivim.',
       links: [],
       socials: [
         { type: 'instagram', url: '#' },
@@ -449,15 +464,16 @@
       ],
       media: [
         { src: '', type: 'img', ratio: 'landscape' },
-        { src: '', type: 'img', ratio: 'portrait' },
-        { src: '', type: 'img', ratio: 'portrait' }
+        { src: 'assets/img/3.jpg', type: 'img', ratio: 'landscape' },
+        { src: 'assets/img/untitled (1 of 1).jpg', type: 'img', ratio: 'landscape' },
+        { type: 'video', youtube: 'OpDCJGkiqOE', orientation: 'landscape' }
       ]
     },
     {
       num: '08', title: "En Priméur 25'", category: 'film',
       thumb: 'assets/img/en-primeur.png',
       date: '2025',
-      desc: 'Kratki opis projekta.',
+      desc: 'Za En Primeur 2026, premijerno kušanje mladih vina vinara Slavonije i hrvatskog Podunavlja, održano u prestižnoj Smagradnoj dvorani hotela Esplanade Zagreb, realizirali smo kompletnu foto i video produkciju događaja. Produkcija je obuhvatila dokumentiranje atmosfere događaja, vinara, predstavljanja vina, posjetitelja i detalja same manifestacije, uz stvaranje vizualnog materijala koji prenosi karakter i energiju jednog od važnijih vinskih događaja u Zagrebu. Poseban fokus stavljen je na autentične trenutke, detalje, ljude i prezentaciju vina, stvarajući sadržaj namijenjen daljnjoj promociji događaja, izlagača i organizatora kroz digitalne kanale i društvene mreže. En Primeur 2026. okupio je više od 30 vinara Slavonije i hrvatskog Podunavlja koji su predstavili vina berbe 2025., uz stručnu publiku, sommeliere, ugostitelje, distributere, medije i ljubitelje vina.',
       links: [],
       socials: [
         { type: 'instagram', url: '#' },
@@ -727,11 +743,12 @@
   var popupSocialsWrap  = document.getElementById('popup-socials-wrap');
 
   // Vraća orijentaciju media unosa: 'orientation' je preferirano polje,
-  // 'ratio' ostaje podržan zbog postojećih podataka. Video (YouTube Shorts)
-  // tretira se kao portret jer je format vertikalan (9:16).
+  // 'ratio' ostaje podržan zbog postojećih podataka.
+  // Video: ako nije zadana orijentacija, pretpostavlja se 'portrait'
+  // (Shorts, 9:16) — za horizontalne videe dodajte orientation: 'landscape'.
   function getOrientation(m, fallback) {
     if (!m) return fallback || 'landscape';
-    if (m.type === 'video') return 'portrait';
+    if (m.type === 'video') return m.orientation || 'portrait';
     return m.orientation || m.ratio || fallback || 'landscape';
   }
 
@@ -784,7 +801,9 @@
     var div = document.createElement('div');
 
     if (m && m.type === 'video') {
-      div.className = 'media-item video-vertical';
+      var videoOrient = m.orientation || 'portrait';
+      var videoClass = videoOrient === 'landscape' ? 'landscape' : 'video-vertical';
+      div.className = 'media-item ' + videoClass;
       div.appendChild(buildYoutubeFacade(m, altText));
       return div;
     }
