@@ -6,121 +6,36 @@
   <title>Ivan Rengel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&family=Open+Sans:wght@800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&family=Open+Sans:wght@800&family=Allura&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       width: 100%; height: 100%;
-      overflow: hidden;
       background: #000;
       font-family: 'Open Sans Condensed', 'Open Sans', Arial Narrow, sans-serif;
-    }
-
-    /* ── LOADER ── */
-    #loader {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.7s ease;
-    }
-    #loader.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .loader-logo {
-      font-family: 'Open Sans Condensed', 'Open Sans', Arial Narrow, sans-serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 6vw, 5rem);
-      color: #fff;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* ── VIDEO BACKGROUND ── */
-    #video-container {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
       overflow: hidden;
-      background: #000;
-      /* pointer-events allowed so child blocker div can catch taps */
     }
 
-    /* Transparent div on top of iframe — absorbs all clicks/taps */
-    #video-blocker {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      background: transparent;
-      pointer-events: all;
-      cursor: default;
-    }
-
-    #yt-player {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      /* Desktop: scale to cover fullscreen, 16:9 centered */
-      width: 177.78vh;
-      height: 100vh;
-      min-width: 100vw;
-      min-height: 56.25vw;
-      pointer-events: none;
-    }
-    /* On taller-than-16:9 screens (desktop portrait / very tall) */
-    @media (max-aspect-ratio: 16/9) and (min-width: 769px) {
-      #yt-player {
-        width: 100vw;
-        height: 56.25vw;
-        min-width: unset;
-        min-height: 100vh;
-      }
-    }
-    /*
-      MOBILE: Size video so it is 100vh tall (fills screen vertically).
-      Width = 177.78vh (16:9 ratio). Video is wider than screen → overflow hidden
-      on container clips the sides. Centre it so the MIDDLE third is visible:
-      shift left by one third of the video width = 177.78vh / 3 = 59.26vh.
-    */
-    @media (max-width: 768px) {
-      #yt-player {
-        /* Video is a triptych (3 vertical vids side by side).
-           We want the MIDDLE one. Full height, centred = default. */
-        width: 177.78vh;
-        height: 100vh;
-        min-width: unset;
-        min-height: unset;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    }
-
-    /* ── OVERLAY (keeps text readable) ── */
-    #overlay {
+    /* ── FULLSCREEN BACKGROUND IMAGE ── */
+    #hero {
       position: fixed;
       inset: 0;
       z-index: 1;
-      /* very subtle dark gradient at top/bottom only, no flat color */
-      background:
-        linear-gradient(to bottom,
-          rgba(0,0,0,0.35) 0%,
-          transparent 18%,
-          transparent 82%,
-          rgba(0,0,0,0.35) 100%
-        );
-      pointer-events: none;
+    }
+    #hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    /* On mobile, keep the centre of the image in frame regardless of crop */
+    @media (max-width: 768px) {
+      #hero img {
+        object-position: center center;
+      }
     }
 
     /* ── NAV ── */
@@ -147,7 +62,7 @@
       text-transform: uppercase;
       transition: opacity 0.2s;
     }
-    nav a:hover { opacity: 0.6; }
+    nav a:hover { opacity: 0.5; }
 
     /* ── FOOTER ── */
     footer {
@@ -192,7 +107,7 @@
       text-decoration: none;
       transition: opacity 0.2s;
     }
-    .socials a:hover { opacity: 0.6; }
+    .socials a:hover { opacity: 0.5; }
     .socials a svg { width: 17px; height: 17px; fill: #fff; }
 
     /* ── BURGER (mobile only) ── */
@@ -231,7 +146,7 @@
       position: fixed;
       inset: 0;
       z-index: 150;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.85);
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -273,19 +188,10 @@
 </head>
 <body>
 
-  <!-- LOADER -->
-  <div id="loader">
-    <div class="loader-logo">IVAN RENGEL</div>
+  <!-- FULLSCREEN BACKGROUND IMAGE -->
+  <div id="hero">
+    <img src="862b326a4438fc99be34b8d822e92407.jpg" alt="Ivan Rengel" />
   </div>
-
-  <!-- VIDEO BACKGROUND -->
-  <div id="video-container">
-    <div id="yt-player"></div>
-    <div id="video-blocker"></div>
-  </div>
-
-  <!-- Gradient overlay for text legibility -->
-  <div id="overlay"></div>
 
   <!-- DESKTOP NAV -->
   <nav>
@@ -295,7 +201,7 @@
     </div>
     <div class="nav-right">
       <a href="hangar19-info.html">INFO</a>
-      <a href="hangar19-contact.html">CONTACT US</a>
+      <a href="hangar19-contact.html">CONTACT</a>
     </div>
   </nav>
 
@@ -309,7 +215,7 @@
     <a href="index.html">HOME</a>
     <a href="hangar19-work.html">WORK</a>
     <a href="hangar19-info.html">INFO</a>
-    <a href="hangar19-contact.html">CONTACT US</a>
+    <a href="hangar19-contact.html">CONTACT</a>
   </div>
 
   <!-- FOOTER -->
@@ -318,21 +224,21 @@
     <div class="socials">
       <span class="socials-label">SOCIALS</span>
       <!-- Facebook -->
-      <a href="#" aria-label="Facebook">
+      <a href="https://www.facebook.com/ivan.rengel.7169" aria-label="Facebook">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
         </svg>
       </a>
       <!-- Instagram -->
-      <a href="#" aria-label="Instagram">
+      <a href="https://www.instagram.com/rengel_ivan/" aria-label="Instagram">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="#fff" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="2"/>
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="#000" stroke-width="2"/>
+          <circle cx="12" cy="12" r="4" fill="none" stroke="#000" stroke-width="2"/>
           <circle cx="17.5" cy="6.5" r="1.2"/>
         </svg>
       </a>
       <!-- Behance -->
-      <a href="#" aria-label="Behance">
+      <a href="https://www.behance.net/redoagency" aria-label="Behance">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029H23.726zm-7.726-3h3.578c-.118-1.482-1.057-2.065-1.883-2.065-.851 0-1.63.647-1.695 2.065zM7.18 10.011c1.049-.045 2.34-.124 2.34 1.66 0 1.815-1.356 1.8-2.34 1.8H5V10H7.18zM5 17.5h2.831C9 17.5 10 17 10 15.5c0-1.508-1.141-1.938-2.37-1.938H5V17.5zM0 22V2h8.5C11 2 13.5 3.5 13.5 6.5c0 1.879-1.083 3.211-2.744 3.879C12.875 11.02 14 12.5 14 15c0 3.5-2.5 7-8 7H0z"/>
         </svg>
@@ -340,59 +246,7 @@
     </div>
   </footer>
 
-  <!-- YouTube IFrame API -->
   <script>
-    var player;
-    var videoReady = false;
-
-    // Load YT IFrame API
-    var tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag);
-
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('yt-player', {
-        videoId: 'r5X3bgpCqJ4',
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          loop: 1,
-          playlist: 'r5X3bgpCqJ4',
-          controls: 0,
-          showinfo: 0,
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          iv_load_policy: 3,
-          disablekb: 1,
-          fs: 0
-        },
-        events: {
-          onReady: function(e) {
-            e.target.mute();
-            e.target.playVideo();
-          },
-          onStateChange: function(e) {
-            // When playing for the first time, hide loader
-            if (e.data === YT.PlayerState.PLAYING && !videoReady) {
-              videoReady = true;
-              setTimeout(function() {
-                document.getElementById('loader').classList.add('hidden');
-              }, 400);
-            }
-          }
-        }
-      });
-    }
-
-    // Fallback: hide loader after 6s if video never fires PLAYING
-    setTimeout(function() {
-      var loader = document.getElementById('loader');
-      if (!loader.classList.contains('hidden')) {
-        loader.classList.add('hidden');
-      }
-    }, 6000);
-
     // ── BURGER MENU ──
     var burgerBtn = document.getElementById('burger-btn');
     var mobileMenu = document.getElementById('mobile-menu');
