@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ivan Rengel — Contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --font: 'Open Sans Condensed', 'Open Sans', Arial Narrow, sans-serif; }
+
+    body {
+      background: #fff; color: #111;
+      font-family: 'Open Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* LOADER */
+    #loader {
+      position: fixed; inset: 0; background: #000; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.7s ease;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-logo {
+      font-family: var(--font); font-weight: 800;
+      font-size: clamp(2rem, 6vw, 5rem);
+      color: #fff; letter-spacing: 0.08em; text-transform: uppercase;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* PAGE */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 48px 0;
+    }
+
+    /* BACK */
+    .back-link {
+      display: inline-block;
+      font-family: var(--font); font-weight: 800;
+      font-size: 0.82rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #111;
+      text-decoration: none; margin-bottom: 36px;
+    }
+    .back-link:hover { opacity: 0.4; }
+
+    /* IMAGE */
+    .contact-image {
+      width: 100%;
+      aspect-ratio: 16/6;
+      background: #e8e8e8;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .contact-image img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    /* FORM SECTION */
+    .contact-label {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700; font-size: 0.9rem;
+      color: #111; margin-bottom: 20px;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 40px;
+    }
+
+    .form-field {
+      border: none;
+      border-bottom: 1px solid #ccc;
+      background: none;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.82rem;
+      color: #111;
+      padding: 14px 0;
+      outline: none;
+      width: 100%;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+    .form-field::placeholder { color: #bbb; }
+    .form-field:focus { border-bottom-color: #111; }
+
+    textarea.form-field {
+      min-height: 80px;
+    }
+
+    .submit-btn {
+      display: inline-block;
+      margin-top: 28px;
+      background: none; border: none;
+      font-family: var(--font); font-weight: 800;
+      font-size: 0.88rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #111;
+      cursor: pointer; padding: 0;
+      text-align: left;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.4; }
+
+    /* CONTACT INFO */
+    .contact-info {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-bottom: 0;
+    }
+    .contact-info a {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.82rem;
+      color: #111; text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .contact-info a:hover { opacity: 0.4; }
+
+    /* WATERMARK + COPYRIGHT */
+    .watermark {
+      font-family: var(--font); font-weight: 800;
+      font-size: calc(100vw / 5.5);
+      letter-spacing: -0.01em; text-transform: uppercase;
+      color: #efefef; user-select: none; pointer-events: none;
+      line-height: 1; display: block;
+      margin-left: calc(-50vw + 50%);
+      width: 100vw; text-align: center;
+      margin-top: 60px;
+    }
+    .copyright {
+      text-align: center; padding: 18px 0 40px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.7rem; color: #ccc; letter-spacing: 0.04em;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .page { padding: 36px 20px 0; }
+      .contact-image { aspect-ratio: 16/7; margin-bottom: 32px; }
+      .watermark { font-size: calc(100vw / 4.2); margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader"><div class="loader-logo">Ivan Rengel</div></div>
+
+  <div class="page">
+
+    <a href="index.html" class="back-link">Back</a>
+
+    <!-- Image -->
+    <div class="contact-image">
+      <!--<img src="assets/img/461fde2cc4e7ccef0b157a1c3ce2e862.jpg" alt="Contact"> -->
+    </div>
+
+    <!-- Form -->
+    <div class="contact-label">Kontaktiraj me:</div>
+
+    <form class="contact-form" id="contact-form">
+      <input  class="form-field" type="text"  name="ime"      placeholder="ime"          required />
+      <input  class="form-field" type="text"  name="prezime"  placeholder="prezime"      required />
+      <input  class="form-field" type="tel"   name="tel"      placeholder="+385 99 8459 320" />
+      <textarea class="form-field"            name="poruka"   placeholder="napišite nešto" rows="4"></textarea>
+      <button type="submit" class="submit-btn">Pošalji</button>
+    </form>
+
+    <!-- Contact details -->
+    <div class="contact-info">
+      <a href="mailto:ivanrengel2@gmail.com">ivanrengel2@gmail.com</a>
+      <a href="tel:+38599845932">+385 99 8459 320</a>
+    </div>
+
+    <p class="copyright">© 2026 Ivan Rengel. All rights reserved.</p>
+
+  </div>
+
+  <script>
+    setTimeout(function(){ document.getElementById('loader').classList.add('hidden'); }, 800);
+
+    // Open default mail client with prefilled content
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var ime     = document.querySelector('[name="ime"]').value.trim();
+      var prezime = document.querySelector('[name="prezime"]').value.trim();
+      var tel     = document.querySelector('[name="tel"]').value.trim();
+      var poruka  = document.querySelector('[name="poruka"]').value.trim();
+
+      var subject = encodeURIComponent('Upit — ' + ime + ' ' + prezime);
+      var body    = encodeURIComponent(
+        'Ime: ' + ime + '\n' +
+        'Prezime: ' + prezime + '\n' +
+        (tel ? 'Telefon: ' + tel + '\n' : '') +
+        '\nPoruka:\n' + poruka
+      );
+
+      window.location.href = 'mailto:ivanrengel2@gmail.com?subject=' + subject + '&body=' + body;
+    });
+  </script>
+</body>
+</html>
