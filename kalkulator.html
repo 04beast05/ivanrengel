@@ -593,54 +593,267 @@
       window.location.href = 'mailto:ivanrengel2@gmail.com?subject=' + subject + '&body=' + body;
     });
 
-    /* ── PDF (jsPDF — generira se lokalno u browseru, bez troška) ──
-       Ovo je jednostavan, funkcionalan raspored. Dizajn ponude
-       Ivan naknadno prilagođava — vidi objašnjenje u chatu. */
+    /* ── PDF PONUDA — minimalistički premium dizajn ──
+       Crna pozadina, jasna hijerarhija, objašnjenje formiranja cijene
+       i automatsko dodavanje druge stranice ako je opis projekta duži.
+       Za footer sliku: kasnije se može zamijeniti geometrijski footer
+       pravom fotografijom bez promjene ostatka ponude. */
     document.getElementById('btn-pdf').addEventListener('click', function() {
       const result = calculate();
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      doc.text('IVAN RENGEL', 20, 25);
+      const W = 210;
+      const H = 297;
+      const M = 18;
+      const BLACK = [12, 12, 12];
+      const WHITE = [248, 248, 246];
+      const MUTED = [155, 155, 155];
+      const LINE = [48, 48, 48];
+      const CARD = [22, 22, 22];
+      const ACCENT = [210, 210, 210];
 
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Okvirna ponuda projekta', 20, 33);
-      doc.setDrawColor(0); doc.line(20, 38, 190, 38);
-
-      let y = 50;
-      function line(label, value) {
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-        doc.text(label, 20, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(String(value), 70, y);
-        y += 9;
+      function bg() {
+        doc.setFillColor(...BLACK);
+        doc.rect(0, 0, W, H, 'F');
       }
-      line('Usluga:', state.service ? state.service.name : '—');
-      line('Opseg:', state.qty + ' x ' + (state.service ? state.service.unitLabel : ''));
-      line('Dodatne usluge:', state.addons.map(function(a){return a.name;}).join(', ') || '—');
-      line('Rok:', state.deadline || '—');
-      line('Klijent:', state.ime + ' (' + state.email + ')');
 
-      y += 6; doc.line(20, y, 190, y); y += 15;
-
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
-      doc.text('Procjena: EUR ' + result.min + ' - ' + result.max, 20, y);
-      y += 10;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text('Ovo je okvirna procjena. Konačna cijena definira se nakon briefa.', 20, y);
-
-      if (state.opis) {
-        y += 16;
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-        doc.text('Opis projekta:', 20, y);
-        y += 7;
-        doc.setFont('helvetica', 'normal');
-        const split = doc.splitTextToSize(state.opis, 170);
-        doc.text(split, 20, y);
+      function text(txt, x, y, size, color, font='normal', opts={}) {
+        doc.setFont('helvetica', font);
+        doc.setFontSize(size);
+        doc.setTextColor(...color);
+        doc.text(String(txt), x, y, opts);
       }
+
+      function roundedCard(x, y, w, h, fill=CARD, radius=3) {
+        doc.setFillColor(...fill);
+        doc.roundedRect(x, y, w, h, radius, radius, 'F');
+      }
+
+      function rule(y, x1=M, x2=W-M) {
+        doc.setDrawColor(...LINE);
+        doc.setLineWidth(0.25);
+        doc.line(x1, y, x2, y);
+      }
+
+      function footer(pageLabel) {
+        rule(276);
+        text('IVAN RENGEL', M, 286, 7, MUTED, 'bold');
+        text('KALKULATOR PROJEKTA', W/2, 286, 6.5, MUTED, 'normal', {align:'center'});
+        text(String(pageLabel).padStart(2,'0'), W-M, 286, 7, WHITE, 'bold', {align:'right'});
+
+        // Minimalistički "image-like" footer motiv koji se kasnije može
+        // zamijeniti stvarnom fotografijom bez mijenjanja layouta.
+        doc.setFillColor(...WHITE);
+        doc.rect(M, 289, 24, 1, 'F');
+        doc.setFillColor(...MUTED);
+        doc.rect(M+27, 289, 8, 1, 'F');
+        doc.setFillColor(...LINE);
+        doc.rect(M+38, 289, 34, 1, 'F');
+      }
+
+      function wrapped(txt, x, y, maxWidth, size=9, color=WHITE, lineHeight=5) {
+        const lines = doc.splitTextToSize(String(txt || '—'), maxWidth);
+        text(lines, x, y, size, color, 'normal');
+        return y + lines.length * lineHeight;
+      }
+
+      function euroRange() {
+        return '€' + result.min.toLocaleString('hr-HR') + ' – €' + result.max.toLocaleString('hr-HR');
+      }
+
+      bg();
+
+      // HEADER
+      text('IVAN', M, 24, 18, WHITE, 'bold');
+      text('RENGEL', M, 32, 18, WHITE, 'bold');
+      text('CREATIVE / DIGITAL / VISUAL', W-M, 23, 6.5, MUTED, 'bold', {align:'right'});
+      text('OKVIRNA PONUDA', W-M, 31, 6.5, MUTED, 'normal', {align:'right'});
+
+      rule(40);
+
+      // CLIENT / PROJECT META
+      text('PONUDA', M, 51, 7, MUTED, 'bold');
+      text(new Date().toLocaleDateString('hr-HR'), M, 58, 8, WHITE, 'normal');
+
+      const clientName = state.ime || 'Klijent';
+      text(clientName, W-M, 52, 10, WHITE, 'bold', {align:'right'});
+      text(state.email || '—', W-M, 59, 7.5, MUTED, 'normal', {align:'right'});
+
+      // HERO PRICE
+      roundedCard(M, 70, W-M*2, 52);
+      text('PROCJENJENA CIJENA PROJEKTA', M+9, 82, 7, MUTED, 'bold');
+      text(euroRange(), M+9, 101, 23, WHITE, 'bold');
+      text(
+        result.urgent
+          ? 'ŽURNA TARIFA uključena u izračun (+30%)'
+          : 'Okvirna procjena prema odabranim parametrima',
+        M+9, 113, 7, result.urgent ? WHITE : MUTED, result.urgent ? 'bold' : 'normal'
+      );
+
+      // PROJECT DETAILS
+      text('01 / PROJEKT', M, 138, 7, MUTED, 'bold');
+      rule(143);
+
+      const serviceName = state.service ? state.service.name : '—';
+      const scope = state.qty + ' × ' + (state.service ? state.service.unitLabel : 'jedinica');
+      const addons = state.addons.length
+        ? state.addons.map(function(a){ return a.name; }).join(', ')
+        : 'Nema dodatnih usluga';
+      const deadline = state.deadline || 'Nije definiran';
+
+      function metaRow(label, value, y) {
+        text(label, M, y, 7, MUTED, 'bold');
+        const lines = doc.splitTextToSize(String(value), 118);
+        text(lines, M+39, y, 8.5, WHITE, 'normal');
+        return y + Math.max(9, lines.length * 5.5);
+      }
+
+      let y = 153;
+      y = metaRow('USLUGA', serviceName, y);
+      y = metaRow('OPSEG', scope, y);
+      y = metaRow('DODACI', addons, y);
+      y = metaRow('ROK', deadline + (result.urgent ? '  •  žurna tarifa' : ''), y);
+
+      // PRICE FORMATION
+      const priceTop = Math.max(y + 7, 198);
+      text('02 / KAKO JE CIJENA FORMIRANA', M, priceTop, 7, MUTED, 'bold');
+      rule(priceTop + 5);
+
+      const baseMin = state.service ? state.service.min : 0;
+      const baseMax = state.service ? state.service.max : 0;
+      const qtyExtra = state.service && state.qty > 1
+        ? (state.qty - 1) * state.service.unitPrice
+        : 0;
+      const addonTotal = state.addons.reduce(function(sum, a){ return sum + a.price; }, 0);
+      const subtotalMin = baseMin + qtyExtra + addonTotal;
+      const subtotalMax = baseMax + qtyExtra + addonTotal;
+
+      const breakdown = [
+        ['Osnovna usluga', '€' + baseMin + ' – €' + baseMax],
+        ['Dodatni opseg', '€' + qtyExtra],
+        ['Dodatne usluge', '€' + addonTotal],
+        [result.urgent ? 'Žurna tarifa (+30%)' : 'Rok', result.urgent ? '× 1,30' : 'bez nadoplate']
+      ];
+
+      let by = priceTop + 17;
+      breakdown.forEach(function(row, i) {
+        text(row[0], M, by, 7.5, i === 0 ? WHITE : MUTED, i === 0 ? 'bold' : 'normal');
+        text(row[1], W-M, by, 7.5, WHITE, 'bold', {align:'right'});
+        by += 9;
+      });
+
+      rule(by - 3);
+      text('KONAČNA PROCJENA', M, by + 7, 7, MUTED, 'bold');
+      text(euroRange(), W-M, by + 8, 11, WHITE, 'bold', {align:'right'});
+
+      footer(1);
+
+      // PAGE 2 — explanation / brief
+      doc.addPage();
+      bg();
+
+      text('IVAN', M, 24, 18, WHITE, 'bold');
+      text('RENGEL', M, 32, 18, WHITE, 'bold');
+      text('PONUDA / DETALJI', W-M, 27, 7, MUTED, 'bold', {align:'right'});
+      rule(40);
+
+      text('03 / ŠTO JE UKLJUČENO U PROCJENU', M, 53, 7, MUTED, 'bold');
+
+      roundedCard(M, 60, W-M*2, 43);
+      text(serviceName, M+9, 72, 11, WHITE, 'bold');
+      text(scope, M+9, 81, 7.5, MUTED, 'normal');
+
+      const explanation =
+        'Raspon cijene nije fiksna ponuda već početna procjena. Donja i gornja vrijednost '
+        + 'ovisne su o opsegu, količini materijala, razini obrade i dodatnim zahtjevima. '
+        + 'Nakon detaljnog briefa definira se točan opseg i konačna cijena projekta.';
+      wrapped(explanation, M+9, 91, W-M*2-18, 7.2, MUTED, 4.2);
+
+      let yy = 118;
+
+      text('04 / DODATNE USLUGE', M, yy, 7, MUTED, 'bold');
+      yy += 8;
+
+      if (state.addons.length) {
+        state.addons.forEach(function(a) {
+          roundedCard(M, yy, W-M*2, 13);
+          text(a.name, M+7, yy+8, 7.5, WHITE, 'normal');
+          text('+ €' + a.price, W-M-7, yy+8, 7.5, WHITE, 'bold', {align:'right'});
+          yy += 17;
+        });
+      } else {
+        roundedCard(M, yy, W-M*2, 13);
+        text('Nisu odabrane dodatne usluge.', M+7, yy+8, 7.5, MUTED, 'normal');
+        yy += 17;
+      }
+
+      yy += 5;
+      text('05 / OPIS PROJEKTA', M, yy, 7, MUTED, 'bold');
+      yy += 8;
+
+      const description = state.opis || 'Opis projekta nije dodat.';
+      roundedCard(M, yy, W-M*2, 60);
+      wrapped(description, M+9, yy+12, W-M*2-18, 8, WHITE, 5);
+
+      yy += 70;
+      text('NAPOMENA', M, yy, 7, MUTED, 'bold');
+      yy += 7;
+      const note =
+        'Ova ponuda je informativna i automatski generirana. Konačna cijena može se '
+        + 'promijeniti nakon pregleda detaljnog briefa, materijala i stvarnog opsega posla.';
+      wrapped(note, M, yy, W-M*2, 7.5, MUTED, 4.5);
+
+      footer(2);
+
+      // PAGE 3 — compact terms if needed / always useful for a "real offer"
+      doc.addPage();
+      bg();
+
+      text('IVAN', M, 24, 18, WHITE, 'bold');
+      text('RENGEL', M, 32, 18, WHITE, 'bold');
+      text('SAŽETAK', W-M, 27, 7, MUTED, 'bold', {align:'right'});
+      rule(40);
+
+      text('06 / SAŽETAK PONUDE', M, 54, 7, MUTED, 'bold');
+
+      roundedCard(M, 62, W-M*2, 46);
+      text('KONAČNA PROCJENA', M+9, 75, 7, MUTED, 'bold');
+      text(euroRange(), M+9, 96, 21, WHITE, 'bold');
+
+      const summaryItems = [
+        ['Usluga', serviceName],
+        ['Opseg', scope],
+        ['Dodatne usluge', addons],
+        ['Rok', deadline],
+        ['Klijent', clientName]
+      ];
+
+      let sy = 122;
+      summaryItems.forEach(function(item) {
+        text(item[0], M, sy, 7, MUTED, 'bold');
+        const lines = doc.splitTextToSize(item[1], 120);
+        text(lines, M+39, sy, 8, WHITE, 'normal');
+        sy += Math.max(11, lines.length * 5.2);
+        rule(sy - 4);
+      });
+
+      text('SLJEDEĆI KORAK', M, sy + 11, 7, MUTED, 'bold');
+      text('Nakon potvrde interesa slijedi detaljni brief i finalizacija opsega.', M, sy + 21, 8.5, WHITE, 'normal');
+
+      // Footer image area / visual signature zone
+      roundedCard(M, 224, W-M*2, 38, [17,17,17]);
+      text('IVAN RENGEL', M+9, 238, 10, WHITE, 'bold');
+      text('Creative / Digital / Visual', M+9, 247, 7, MUTED, 'normal');
+      text('Ovdje može doći tvoja fotografija / frame / logo', W-M-9, 241, 6.5, MUTED, 'normal', {align:'right'});
+      text('FOOTER IMAGE AREA', W-M-9, 249, 6, LINE, 'bold', {align:'right'});
+
+      footer(3);
 
       doc.save('ponuda-ivan-rengel.pdf');
     });
